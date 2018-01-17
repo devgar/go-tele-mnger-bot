@@ -1,16 +1,34 @@
 package main
-import("os"; "os/exec"; "log"; "gopkg.in/telegram-bot-api.v4")
+
+import s "strings"
+import("os"; "os/exec"; "path"; "log"; "gopkg.in/telegram-bot-api.v4")
+
 
 var bot *tgbotapi.BotAPI
 
 func processUpdate(update tgbotapi.Update) {
-  text, err := exec.Command("ls", "-s").Output()
-  if err != nil { log.Panic(err) }
-  
-  msg := tgbotapi.NewMessage(update.Message.Chat.ID, string(text))
-  msg.ReplyToMessageID = update.Message.MessageID
+  var txt = update.Message.Text
+  if txt[0] != '_' {
+    sendReply(update.Message, "Error: Unallowed")
+  } else {
+    command := s.Split(txt[1:], " ")[0] + ".sh"
+    log.Printf("Command to run: %s", command)
+    text, err := exec.Command("ls", "-s").Output()
+    if err != nil { log.Panic(err) }
+    sendReply(update.Message, string(text))
+  }
+}
 
+func sendReply(message *tgbotapi.Message, text string) {
+  msg := tgbotapi.NewMessage(message.Chat.ID, text)
+  msg.ReplyToMessageID = message.MessageID
+  
   bot.Send(msg)
+}
+
+func scriptExists(command string) bool {
+  _, err := os.Stat(path.Join("/usr", command))
+  return os.IsNotExist(err)
 }
 
 func initBot(key string) *tgbotapi.BotAPI {
@@ -32,7 +50,11 @@ func main() {
 
   for update := range updates {
     if update.Message == nil { continue }
-    log.Printf("Message from %d", update.Message.From.ID)
+    log.Printf("Message from %d (%s %s):\n%s\n", 
+      update.Message.From.ID,
+      update.Message.From.FirstName,
+      update.Message.From.LastName, 
+      update.Message.Text)
     go processUpdate(update)
   }
 }
