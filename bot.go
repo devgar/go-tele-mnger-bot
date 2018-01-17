@@ -1,7 +1,9 @@
 package main
 import("os"; "os/exec"; "log"; "gopkg.in/telegram-bot-api.v4")
+import "flag"
 
 var bot *tgbotapi.BotAPI
+var scripts, user, token string
 
 func processUpdate(update tgbotapi.Update) {
   text, err := exec.Command("ls", "-s").Output()
@@ -13,6 +15,16 @@ func processUpdate(update tgbotapi.Update) {
   bot.Send(msg)
 }
 
+func initFlags() {
+  flag.StringVar(&scripts, "scripts", "/etc/mngr/scripts", "scripts path")
+  flag.StringVar(&token, "token", "", "Bot Api token")
+  flag.StringVar(&user, "user", "", "Unique user allowed ID")
+  flag.Parse()
+  // log.Println(scripts)
+  // log.Println(token)
+  // log.Println(user)
+}
+
 func initBot(key string) *tgbotapi.BotAPI {
   apiBot, err :=tgbotapi.NewBotAPI(key)
   if err != nil { log.Panic(err) }
@@ -20,8 +32,9 @@ func initBot(key string) *tgbotapi.BotAPI {
 }
 
 func main() {
+  initFlags()
   KEY := os.Getenv("MNGR_TOKEN")
-  if len(os.Args) > 1 { KEY = os.Args[1] }
+  if len(token) > 1 { KEY = token }
   bot = initBot(KEY)
   
   u := tgbotapi.NewUpdate(0)
