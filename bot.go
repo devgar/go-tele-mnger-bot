@@ -1,5 +1,4 @@
 package main
-
 import("os"; "os/exec"; "log"; "gopkg.in/telegram-bot-api.v4")
 
 var bot *tgbotapi.BotAPI
@@ -21,8 +20,8 @@ func initBot(key string) *tgbotapi.BotAPI {
 }
 
 func main() {
-  
   KEY := os.Getenv("MNGR_TOKEN")
+  if len(os.Args) > 1 { KEY = os.Args[1] }
   bot = initBot(KEY)
   
   u := tgbotapi.NewUpdate(0)
