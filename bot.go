@@ -1,9 +1,11 @@
 package main
 import("os"; "os/exec"; "log"; "gopkg.in/telegram-bot-api.v4")
-import "flag"
+import("flag"; "fmt")
 
 var bot *tgbotapi.BotAPI
-var scripts, user, token string
+var verbose bool
+var scripts, user string
+var token = "token"
 
 func processUpdate(update tgbotapi.Update) {
   text, err := exec.Command("ls", "-s").Output()
@@ -17,12 +19,16 @@ func processUpdate(update tgbotapi.Update) {
 
 func initFlags() {
   flag.StringVar(&scripts, "scripts", "/etc/mngr/scripts", "scripts path")
-  flag.StringVar(&token, "token", "", "Bot Api token")
+  flag.StringVar(&token, "token", token, "Bot Api token")
   flag.StringVar(&user, "user", "", "Unique user allowed ID")
+  flag.BoolVar(&verbose, "V", false, "Print additional infomation")
   flag.Parse()
-  // log.Println(scripts)
-  // log.Println(token)
-  // log.Println(user)
+  if verbose {
+    log.Println("Arguments parsed:")
+    fmt.Printf("  scripts '%s'\n", scripts)
+    fmt.Printf("  token   '%s'\n", token)
+    fmt.Printf("  user    '%s'\n", user)
+  }
 }
 
 func initBot(key string) *tgbotapi.BotAPI {
@@ -32,10 +38,9 @@ func initBot(key string) *tgbotapi.BotAPI {
 }
 
 func main() {
+  token = os.Getenv("MNGR_TOKEN")
   initFlags()
-  KEY := os.Getenv("MNGR_TOKEN")
-  if len(token) > 1 { KEY = token }
-  bot = initBot(KEY)
+  bot = initBot(token)
   
   u := tgbotapi.NewUpdate(0)
   u.Timeout = 60
