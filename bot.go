@@ -13,13 +13,20 @@ func processUpdate(update tgbotapi.Update) {
   var txt = update.Message.Text
   if txt[0] != '_' {
     sendReply(update.Message, "Error: Unallowed")
-  } else {
-    command := s.Split(txt[1:], " ")[0] + ".sh"
-    log.Printf("Command to run: %s", command)
-    text, err := exec.Command("ls", "-s").Output()
-    if err != nil { log.Panic(err) }
-    sendReply(update.Message, string(text))
+    return 
   }
+  command := s.Split(txt[1:], " ")[0] + ".sh"
+  
+  if !scriptExists(command) {
+    sendReply(update.Message, "Command not found")
+    return 
+  }
+  
+  text, err := exec.Command(command).Output()
+  if err != nil {
+    sendReply(update.Message, "[!]Error on command execution")
+  }
+  sendReply(update.Message, string(text))
 }
 
 func sendReply(message *tgbotapi.Message, text string) {
@@ -30,8 +37,8 @@ func sendReply(message *tgbotapi.Message, text string) {
 }
 
 func scriptExists(command string) bool {
-  _, err := os.Stat(path.Join("/usr", command))
-  return os.IsNotExist(err)
+  _, err := os.Stat(path.Join(scripts, command))
+  return !os.IsNotExist(err)
 }
 
 func initFlags() {
