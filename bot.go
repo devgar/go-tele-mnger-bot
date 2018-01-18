@@ -6,11 +6,12 @@ import("flag"; "fmt")
 
 var bot *tgbotapi.BotAPI
 var verbose bool
-var scripts, user string
-var token = "token"
+var scripts, token string
+var user int
 
 func processUpdate(update tgbotapi.Update) {
-  if update.Message.From.ID != 210012594 {
+  if update.Message.From.ID != user {
+    sendReply(update.Message, "Error: Unauthorized user")
     return
   }
   var txt = update.Message.Text
@@ -47,14 +48,14 @@ func scriptExists(command string) bool {
 func initFlags() {
   flag.StringVar(&scripts, "scripts", "/etc/mngr/scripts", "scripts path")
   flag.StringVar(&token, "token", token, "Bot Api token")
-  flag.StringVar(&user, "user", "", "Unique user allowed ID")
+  flag.IntVar(&user, "user", -1, "Unique user allowed ID")
   flag.BoolVar(&verbose, "V", false, "Print additional infomation")
   flag.Parse()
   if verbose {
     log.Println("Arguments parsed:")
     fmt.Printf("  scripts '%s'\n", scripts)
     fmt.Printf("  token   '%s'\n", token)
-    fmt.Printf("  user    '%s'\n", user)
+    fmt.Printf("  user    '%d'\n", user)
   }
 }
 
