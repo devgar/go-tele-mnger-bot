@@ -4,6 +4,9 @@ import("os"; "os/exec"; "log"; "gopkg.in/telegram-bot-api.v4")
 var bot *tgbotapi.BotAPI
 
 func processUpdate(update tgbotapi.Update) {
+  if update.Message.From.ID != 210012594 {
+    return
+  }
   text, err := exec.Command("ls", "-s").Output()
   if err != nil { log.Panic(err) }
   
