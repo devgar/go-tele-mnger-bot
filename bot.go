@@ -17,15 +17,15 @@ func processUpdate(update tgbotapi.Update) {
   var txt = update.Message.Text
   if txt[0] != '_' {
     sendReply(update.Message, "Error: Unallowed")
-    return 
+    return
   }
-  command := s.Split(txt[1:], " ")[0] + ".sh"
-  
+  command := s.Split(txt[1:], " ")[0]
+
   if !scriptExists(command) {
     sendReply(update.Message, "Command not found")
-    return 
+    return
   }
-  
+
   text, err := exec.Command(command).Output()
   if err != nil {
     sendReply(update.Message, "[!]Error on command execution")
@@ -36,7 +36,7 @@ func processUpdate(update tgbotapi.Update) {
 func sendReply(message *tgbotapi.Message, text string) {
   msg := tgbotapi.NewMessage(message.Chat.ID, text)
   msg.ReplyToMessageID = message.MessageID
-  
+
   bot.Send(msg)
 }
 
@@ -69,7 +69,7 @@ func main() {
   token = os.Getenv("MNGR_TOKEN")
   initFlags()
   bot = initBot(token)
-  
+
   u := tgbotapi.NewUpdate(0)
   u.Timeout = 60
 
@@ -78,10 +78,10 @@ func main() {
 
   for update := range updates {
     if update.Message == nil { continue }
-    log.Printf("Message from %d (%s %s):\n%s\n", 
+    log.Printf("Message from %d (%s %s):\n%s\n",
       update.Message.From.ID,
       update.Message.From.FirstName,
-      update.Message.From.LastName, 
+      update.Message.From.LastName,
       update.Message.Text)
     go processUpdate(update)
   }
