@@ -5,9 +5,14 @@ import("os"; "os/exec"; "path"; "log"; "gopkg.in/telegram-bot-api.v4")
 import("flag"; "fmt")
 
 var bot *tgbotapi.BotAPI
-var verbose bool
+var verbose, version bool
 var scripts, token string
 var user int
+
+func versionEcho() {
+  fmt.Println("v0.1-beta-2")
+  os.Exit(0)
+}
 
 func processUpdate(update tgbotapi.Update) {
   if update.Message.From.ID != user {
@@ -46,10 +51,11 @@ func scriptExists(command string) bool {
 }
 
 func initFlags() {
-  flag.StringVar(&scripts, "scripts", "/etc/mngr/scripts", "scripts path")
+  flag.StringVar(&scripts, "scripts", "/etc/mngr/scripts", "Scripts path")
   flag.StringVar(&token, "token", token, "Bot Api token")
   flag.IntVar(&user, "user", -1, "Unique user allowed ID")
   flag.BoolVar(&verbose, "V", false, "Print additional infomation")
+  flag.BoolVar(&version, "v", false, "Show version")
   flag.Parse()
   if verbose {
     log.Println("Arguments parsed:")
@@ -68,6 +74,9 @@ func initBot(key string) *tgbotapi.BotAPI {
 func main() {
   token = os.Getenv("MNGR_TOKEN")
   initFlags()
+  if version {
+    versionEcho()
+  }
   bot = initBot(token)
 
   u := tgbotapi.NewUpdate(0)
