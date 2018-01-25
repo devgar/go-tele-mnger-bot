@@ -9,12 +9,19 @@ This telegram bot allows manage your system remotely.
 - A TELEGRAM BOT API TOKEN
 - GOLANG COMPILATION OR RUNTIME
 
+
+
+## Install with cron
+
+Place `tele-mngr-bot`
+
 ## TODO:
 
--[ ] Users verification system
+-[x] Users verification system
 
+-[x] Script launching system
 
--[ ] Script launching system
+-[ ] Arguments passing
 
 
 
