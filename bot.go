@@ -35,13 +35,13 @@ func processUpdate(update tgbotapi.Update) {
   if err != nil {
     sendReply(update.Message, "[!]Error on command execution")
   }
-  sendReply(update.Message, string(text))
+  sendReply(update.Message, "```\n" + string(text) + "\n```")
 }
 
 func sendReply(message *tgbotapi.Message, text string) {
   msg := tgbotapi.NewMessage(message.Chat.ID, text)
   msg.ReplyToMessageID = message.MessageID
-
+  msg.ParseMode = "Markdown"
   bot.Send(msg)
 }
 
