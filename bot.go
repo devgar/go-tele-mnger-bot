@@ -31,7 +31,7 @@ func processUpdate(update tgbotapi.Update) {
     return
   }
 
-  text, err := exec.Command(command).Output()
+  text, err := exec.Command(path.Join(scripts, command)).Output()
   if err != nil {
     sendReply(update.Message, "[!]Error on command execution")
   }
